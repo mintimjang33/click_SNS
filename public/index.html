@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>딸깍비서</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-row">
+      <div class="brand">
+        <span class="brand-badge">📝</span>
+        <div>
+          <div class="brand-name">딸깍비서</div>
+          <div class="brand-sub">개인용 AI 글쓰기 자동화 · 네이버 블로그·카페 · Blogger · 인스타그램 · Threads</div>
+          <div class="brand-sub2">로컬 서버(Playwright)로 실행되는 개인용 도구입니다. API 키 불필요, 브라우저 로그인 세션을 그대로 씁니다.</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- 사이트 연결 -->
+    <section class="card card--accent">
+      <div class="card-title">🔗 사이트 연결</div>
+      <label class="field-label" for="site-select">연결 대상</label>
+      <select id="site-select">
+        <option value="naver_blog">네이버 블로그</option>
+        <option value="naver_cafe">네이버 카페</option>
+        <option value="instagram">Instagram</option>
+        <option value="threads">Threads</option>
+        <option value="blogger">Blogger</option>
+      </select>
+      <div class="btn-row">
+        <button id="btn-open-site" class="btn btn-outline btn-block">🌐 사이트 열기</button>
+        <button id="btn-connect" class="btn btn-step btn-block">① 현재 탭 연결하기</button>
+      </div>
+      <p id="connect-status-text" class="muted">
+        연결된 작성 페이지가 없습니다. '사이트 열기'로 브라우저 창에서 로그인 후 글쓰기 화면까지 이동한 뒤 '현재 탭 연결하기'를 누르세요.
+      </p>
+    </section>
+
+    <!-- 작성 모드 -->
+    <section class="card">
+      <label class="field-label" for="write-mode-select">작성 모드</label>
+      <select id="write-mode-select">
+        <option value="blog_ai_full">블로그·카페·Google Blogger · AI로 글/이미지 생성</option>
+        <option value="blog_my_photos">블로그·카페·Google Blogger · 내 사진으로 글쓰기</option>
+        <option value="instagram">Instagram (이미지 1~10장 · 공유 전까지)</option>
+        <option value="threads">Threads (글·이미지 · 게시 전까지)</option>
+      </select>
+    </section>
+
+    <!-- 내 사진 업로드 -->
+    <section id="photo-upload-card" class="card hidden">
+      <label class="field-label">사진 추가 (여러 장 가능)</label>
+      <input type="file" id="photo-input" accept="image/*" multiple />
+      <div id="photo-gallery" class="gallery"></div>
+    </section>
+
+    <!-- 초안 입력 -->
+    <section class="card">
+      <label class="field-label" for="draft-method-select">초안 작성 방식</label>
+      <select id="draft-method-select">
+        <option value="manual">사용자 입력 기준 블로그 초안 만들기</option>
+        <option value="naver_search_ref">네이버 검색 결과를 참고해서 초안 만들기</option>
+        <option value="naver_blog_search_ref">네이버 블로그 서비스의 검색 결과를 참고해서 초안 만들기</option>
+      </select>
+
+      <label class="field-label" for="topic-input">주제</label>
+      <textarea id="topic-input" rows="3" placeholder="예: 초보자를 위한 생성형 AI 업무 활용법"></textarea>
+
+      <div class="field-grid">
+        <div>
+          <label class="field-label" for="audience-input">대상 독자</label>
+          <input type="text" id="audience-input" placeholder="예: 1인 사업자, 마케터" />
+        </div>
+        <div>
+          <label class="field-label" for="keywords-input">핵심 키워드</label>
+          <input type="text" id="keywords-input" placeholder="쉼표로 구분" />
+        </div>
+      </div>
+
+      <label class="field-label" for="extra-request-input">추가 요청사항</label>
+      <textarea id="extra-request-input" rows="3" placeholder="예: 초보자 눈높이로 설명, 가격 비교 표 포함, 과장 표현 제외"></textarea>
+
+      <div class="field-grid">
+        <div>
+          <label class="field-label" for="tone-select">톤</label>
+          <select id="tone-select">
+            <option value="friendly" selected>친근한 정보형</option>
+            <option value="expert">전문가형</option>
+            <option value="review">후기형</option>
+            <option value="story">스토리형</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label" for="length-select">분량</label>
+          <select id="length-select">
+            <option value="short">짧게</option>
+            <option value="medium" selected>보통</option>
+            <option value="long">길게</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-grid">
+        <div>
+          <label class="field-label" for="post-type-select">글 유형</label>
+          <select id="post-type-select">
+            <option value="auto" selected>주제에 맞게 자동 선택</option>
+            <option value="info">정보 정리형</option>
+            <option value="review">사용 후기형</option>
+            <option value="compare">비교 분석형</option>
+            <option value="howto">단계별 사용법형</option>
+            <option value="place_review">장소·방문 리뷰형</option>
+            <option value="story">경험 스토리형</option>
+            <option value="checklist">체크리스트형</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label" for="text-ai-select">글 생성 AI</label>
+          <select id="text-ai-select">
+            <option value="gemini">Gemini</option>
+            <option value="chatgpt">ChatGPT</option>
+            <option value="claude">Claude</option>
+          </select>
+        </div>
+      </div>
+
+      <label class="field-label" for="ai-chat-mode-select">AI 채팅 모드</label>
+      <select id="ai-chat-mode-select">
+        <option value="new-chat">새 채팅</option>
+        <option value="temp-chat">임시채팅</option>
+      </select>
+
+      <div class="btn-row">
+        <button id="btn-generate-draft" class="btn btn-step btn-block">② 초안 작성</button>
+        <button id="btn-copy-html" class="btn btn-outline btn-block">HTML 복사</button>
+      </div>
+      <button id="btn-reset-result" class="btn btn-soft-warning btn-block">결과 초기화</button>
+    </section>
+
+    <!-- 진행 상태 -->
+    <section id="progress-card" class="card hidden">
+      <div class="progress-row">
+        <div class="spinner"></div>
+        <span id="progress-text">AI가 작업 중입니다…</span>
+      </div>
+    </section>
+
+    <!-- 초안 미리보기 -->
+    <section class="card">
+      <div class="card-title">초안 미리보기</div>
+      <div id="draft-empty" class="empty-box">아직 작성된 초안이 없습니다.</div>
+      <div id="draft-edit-block" class="hidden">
+        <label class="field-label">제목</label>
+        <input type="text" id="draft-title" />
+        <label class="field-label">본문</label>
+        <textarea id="draft-body" rows="10"></textarea>
+        <label class="field-label">태그</label>
+        <input type="text" id="draft-tags" placeholder="쉼표로 구분" />
+        <div class="revise-row">
+          <input type="text" id="revise-input" placeholder="AI에게 수정 요청… (예: 더 짧게, 이 부분 강조)" />
+          <button id="btn-revise" class="btn btn-outline">수정 요청</button>
+        </div>
+        <button id="btn-view-html" class="btn btn-outline btn-block">🔍 최종 HTML 미리보기</button>
+      </div>
+    </section>
+
+    <!-- 자동 이미지 생성 -->
+    <section class="card">
+      <div class="card-title">자동 이미지 생성</div>
+      <label class="field-label" for="image-type-select">이미지 유형</label>
+      <select id="image-type-select">
+        <option value="standard" selected>일반 블로그 이미지</option>
+        <option value="card-news">카드뉴스형 (텍스트 오버레이)</option>
+      </select>
+      <label class="field-label" for="image-req-input">자동 이미지 요구사항</label>
+      <textarea id="image-req-input" rows="2" placeholder="예: 따뜻한 우드톤, 핵심 키워드가 잘 보이는 카드뉴스 인포그래픽 형태"></textarea>
+      <label class="field-label" for="ref-image-input">필수 참고 이미지</label>
+      <input type="file" id="ref-image-input" accept="image/*" />
+      <label class="field-label" for="ref-image-prompt-input">참고 이미지 반영 프롬프트</label>
+      <textarea id="ref-image-prompt-input" rows="2" placeholder="예: 첨부한 제품 이미지를 반드시 중심 소재로 사용하고, 색상과 형태를 유지해 주세요."></textarea>
+      <button id="btn-generate-images" class="btn btn-step btn-block">③ 자동 이미지 생성</button>
+    </section>
+
+    <!-- 이미지 갤러리 -->
+    <section class="card">
+      <div class="card-title">이미지 갤러리</div>
+      <button id="btn-clear-images" class="btn btn-soft-warning btn-block">이미지 비우기</button>
+      <div id="image-gallery-empty" class="empty-box">먼저 블로그 글 초안을 작성해 주세요.</div>
+      <div id="image-gallery" class="gallery hidden"></div>
+    </section>
+
+    <!-- 최종 입력 -->
+    <section class="card">
+      <div class="card-title">최종 입력</div>
+      <button id="btn-insert" class="btn btn-step-solid btn-block">④ 연결된 글쓰기창에 넣기</button>
+      <label class="toggle-row">
+        <input type="checkbox" id="auto-publish-toggle" />
+        <span>넣은 뒤 자동 발행까지 진행 (고급/선택 기능)</span>
+      </label>
+    </section>
+
+    <!-- 실시간 로그 -->
+    <section class="card">
+      <div class="card-head">
+        <span class="card-title">📋 실시간 실행 &amp; 진단 로그</span>
+        <button id="btn-copy-log" class="btn btn-outline btn-sm">로그 복사</button>
+      </div>
+      <pre id="log-console" class="log-console">[SYSTEM] 딸깍비서 서버에 연결되었습니다.</pre>
+    </section>
+
+    <!-- 디버그 -->
+    <section class="card">
+      <div class="card-title">🛠️ 디버그 (개발용)</div>
+      <p class="hint">선택자가 안 맞을 때, 연결된 탭이나 AI 탭의 현재 화면을 캡처/덤프해서 확인합니다.</p>
+      <div class="field-grid">
+        <div>
+          <label class="field-label" for="debug-target-select">대상</label>
+          <select id="debug-target-select">
+            <option value="naver_blog">naver_blog</option>
+            <option value="naver_cafe">naver_cafe</option>
+            <option value="instagram">instagram</option>
+            <option value="threads">threads</option>
+            <option value="blogger">blogger</option>
+            <option value="ai_gemini">ai_gemini</option>
+            <option value="ai_chatgpt">ai_chatgpt</option>
+            <option value="ai_claude">ai_claude</option>
+          </select>
+        </div>
+        <div style="display:flex; align-items:flex-end; gap:8px;">
+          <button id="btn-debug-screenshot" class="btn btn-outline btn-block">📸 스크린샷</button>
+          <button id="btn-debug-dom" class="btn btn-outline btn-block">🧬 DOM 덤프</button>
+        </div>
+      </div>
+      <img id="debug-screenshot-img" class="hidden" style="width:100%;border-radius:8px;margin-top:8px;" />
+      <pre id="debug-dom-output" class="log-console hidden"></pre>
+    </section>
+
+  </main>
+
+  <!-- HTML 미리보기 모달 -->
+  <div id="modal-preview" class="modal-overlay hidden">
+    <div class="modal modal--wide">
+      <div class="modal-title">최종 HTML 미리보기</div>
+      <iframe id="preview-frame"></iframe>
+      <button id="btn-close-preview" class="btn btn-outline btn-block">닫기</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
